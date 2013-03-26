@@ -9,6 +9,7 @@ public enum BoulderCellEnum {
 	D("Diamant"),
 	P("Personne"),
 	Q("Personne"),
+	C("Coeur"),
 	S("Sortie");
 	
 	private String name;
@@ -24,5 +25,9 @@ public enum BoulderCellEnum {
 			}
 		}
 		return BoulderCellEnum.T;
+	}
+
+	public boolean isPerson() {
+		return this == P || this == Q;
 	}
 }

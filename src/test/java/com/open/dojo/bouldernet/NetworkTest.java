@@ -21,7 +21,7 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import com.open.dojo.bouldernet.gui.BoulderMapServer;
+import com.open.dojo.bouldernet.server.BoulderMapServer;
 
 public class NetworkTest {
 	private BoulderMapServer server;

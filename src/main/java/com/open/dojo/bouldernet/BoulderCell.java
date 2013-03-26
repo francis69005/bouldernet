@@ -17,6 +17,19 @@ public class BoulderCell {
 	public int getY() {
 		return y;
 	}
+	
+	@Override
+	public int hashCode() {
+		return x ^ (y << 3);
+	}
+	
+	@Override
+	public boolean equals(Object o) {
+		if (! (o instanceof BoulderCell)) {
+			return false;
+		}
+		return ((BoulderCell)o).x == x && ((BoulderCell)o).y == y;
+	}
 
 	public BoulderCell getNextCell(DirectionEnum direction) {
 		return new BoulderCell(

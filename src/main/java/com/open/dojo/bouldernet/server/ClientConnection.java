@@ -1,4 +1,4 @@
-package com.open.dojo.bouldernet.gui;
+package com.open.dojo.bouldernet.server;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 import java.net.Socket;
 
+import com.open.dojo.bouldernet.BoulderCell;
+import com.open.dojo.bouldernet.BoulderCellEnum;
 import com.open.dojo.bouldernet.DirectionEnum;
 
 public class ClientConnection implements Runnable{
@@ -15,14 +17,11 @@ public class ClientConnection implements Runnable{
 	private Socket socket;
 	private BoulderMapServer boulderMapServer;
 	private PrintStream printStream;
-	private int score;
-	private int death;
+	private int playerId;
 	
 	public ClientConnection(Socket socket, BoulderMapServer boulderMapServer) {
 		this.socket = socket;	
 		this.boulderMapServer = boulderMapServer;
-		score = 0;
-		death = 0;
 		Thread thread = new Thread(this, "Client Connection");
 		thread.setDaemon(true);
 		thread.start();
@@ -34,13 +33,13 @@ public class ClientConnection implements Runnable{
 			InputStream inputStream = socket.getInputStream();
 			BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
 			
-			int playerId = boulderMapServer.addPlayer();
+			playerId = boulderMapServer.addPlayer();
 			
 			OutputStream outputStream = socket.getOutputStream();
 			printStream = new PrintStream(outputStream);
 			printStream.println("Hello " + playerId);
 			
-			printStream.println(serializeMap());
+			sendChange();
 			
 			while (boulderMapServer.isRunning()) {
 				String moveCommand = bufferedReader.readLine();
@@ -64,7 +63,11 @@ public class ClientConnection implements Runnable{
 				if (x > 0) {
 					builder.append(',');
 				}
-				builder.append(boulderMapServer.getBoulderMap().getMap()[y][x].name());
+				BoulderCellEnum cell = boulderMapServer.getBoulderMap().getMap()[y][x];
+				builder.append(cell.name());
+				if (cell.isPerson()) {
+					builder.append(boulderMapServer.getBoulderMap().getPlayer(new BoulderCell(x, y)).getId());
+				}
 			}
 			builder.append('&');
 		}
@@ -72,23 +75,10 @@ public class ClientConnection implements Runnable{
 	}
 
 	public void sendChange() {
+		printStream.print(boulderMapServer.getBoulderMap().getNbDiamond(playerId));
+		printStream.print("&");
+		printStream.println(boulderMapServer.getBoulderMap().getNbLifes(playerId));
 		printStream.println(serializeMap());
-	}
-
-	public int getScore() {
-		return score;
-	}
-
-	public void setScore(int score) {
-		this.score = score;
-	}
-
-	public int getDeath() {
-		return death;
-	}
-
-	public void setDeath(int death) {
-		this.death = death;
 	}
 
 }
