@@ -1,4 +1,4 @@
-package com.open.dojo.bouldernet.gui;
+package com.open.dojo.bouldernet.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;

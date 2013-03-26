@@ -58,6 +58,7 @@ public class BoulderMap {
 		BoulderCell persoCell = player.getBoulderCell();
 		final BoulderCell wantedPersoCell = persoCell.getNextCell(direction);
 		if (isMoveAllowed(wantedPersoCell, direction)) {
+			player.setDirection(direction);
 			if (map[wantedPersoCell.getY()][wantedPersoCell.getX()] == BoulderCellEnum.R) {
 				BoulderCell behindCell = wantedPersoCell.getNextCell(direction);
 				map[behindCell.getY()][behindCell.getX()] = BoulderCellEnum.R;
@@ -65,7 +66,9 @@ public class BoulderMap {
 				player.addDiamond();
 			}
 			map[persoCell.getY()][persoCell.getX()] = BoulderCellEnum.V;
-			map[wantedPersoCell.getY()][wantedPersoCell.getX()] = BoulderCellEnum.P;
+			map[wantedPersoCell.getY()][wantedPersoCell.getX()] =
+					player.getDirection() == DirectionEnum.LEFT ?
+							BoulderCellEnum.P : BoulderCellEnum.Q;
 			player.setBoulderCell(wantedPersoCell);
 		}
 	}
@@ -116,14 +119,14 @@ public class BoulderMap {
 	}
 
 	public int addPlayer(BoulderCell boulderCell) {
+		int newId = playerById.size();
 		Player player = null;
 		if (boulderCell == null) {
-			player = new Player(getRandomPlayerSpawn());
+			player = new Player(newId, getRandomPlayerSpawn());
 		} else {
 			map[boulderCell.getY()][boulderCell.getX()] = BoulderCellEnum.P;
-			player = new Player(boulderCell);
+			player = new Player(newId, boulderCell);
 		}
-		int newId = playerById.size();
 		playerById.put(newId, player);
 		return newId;
 	}
@@ -140,6 +143,10 @@ public class BoulderMap {
 		return playerById.get(player).getNbDiamond();
 	}
 	
+	public int getNbLifes(int playerId) {
+		return playerById.get(playerId).getNbDeath();
+	}
+	
 	private BoulderCell getRandomPlayerSpawn() {
 		while (true) {
 			int y = (int)(Math.random()*map.length);
@@ -149,6 +156,15 @@ public class BoulderMap {
 				return new BoulderCell(x, y);
 			}
 		}
+	}
+
+	public Player getPlayer(BoulderCell boulderCell) {
+		for (Player player : playerById.values()) {
+			if (player.getBoulderCell().equals(boulderCell)) {
+				return player;
+			}
+		}
+		return null;
 	}
 	
 }
