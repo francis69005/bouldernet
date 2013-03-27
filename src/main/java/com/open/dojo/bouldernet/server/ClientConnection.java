@@ -43,16 +43,20 @@ public class ClientConnection implements Runnable{
 			
 			while (boulderMapServer.isRunning()) {
 				String moveCommand = bufferedReader.readLine();
-				if(moveCommand != null){
-					String[] directionElements = moveCommand.split(" ");
-					boulderMapServer.move(Integer.parseInt(directionElements[1]), DirectionEnum.valueOf(directionElements[0]));
+				if(moveCommand == null) {
+					break;
 				}
+				String[] directionElements = moveCommand.split(" ");
+				boulderMapServer.move(Integer.parseInt(directionElements[1]), DirectionEnum.valueOf(directionElements[0]));
 			}
 			
-			socket.close();
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		} finally {
+			boulderMapServer.removePlayer(this);
+			try {
+				socket.close();
+			} catch (IOException e) {
+			}
 		}
 	}
 
@@ -79,6 +83,10 @@ public class ClientConnection implements Runnable{
 		printStream.print("&");
 		printStream.println(boulderMapServer.getBoulderMap().getNbLifes(playerId));
 		printStream.println(serializeMap());
+	}
+
+	public int getPlayerId() {
+		return playerId;
 	}
 
 }

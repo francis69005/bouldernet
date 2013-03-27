@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.open.dojo.bouldernet.BoulderCell;
 import com.open.dojo.bouldernet.BoulderMap;
 import com.open.dojo.bouldernet.DirectionEnum;
 
@@ -20,13 +21,14 @@ public class BoulderMapServer {
 	private Map<Integer, DirectionEnum> directionByPlayer = new HashMap<Integer, DirectionEnum>();
 	private ServerSocket serverSocket;
 	private boolean running = true;
-	
-
-	public BoulderMap getBoulderMap() {
-		return boulderMap;
-	}
+	private boolean autoSpawn;
 
 	public BoulderMapServer(BoulderMap boulderMap) throws IOException {
+		this(boulderMap, true);
+	}
+	
+	public BoulderMapServer(BoulderMap boulderMap, boolean autoSpawn) throws IOException {
+		this.autoSpawn = autoSpawn;
 		this.boulderMap = boulderMap;
 		
 		// ouverture du socket de rendez-vous
@@ -87,6 +89,10 @@ public class BoulderMapServer {
 		threadClient.setDaemon(true);
 		threadClient.start();
 	}
+	
+	public BoulderMap getBoulderMap() {
+		return boulderMap;
+	}
 
 	public void move(int playerId, DirectionEnum direction) {
 		synchronized (directionByPlayer) {
@@ -95,7 +101,12 @@ public class BoulderMapServer {
 	}
 	
 	public int addPlayer() {
-		return boulderMap.addPlayer(null);
+		return boulderMap.addPlayer(autoSpawn ? null : new BoulderCell(0, 0));
+	}
+	
+	public void removePlayer(ClientConnection clientConnection) {
+		boulderMap.removePlayer(clientConnection.getPlayerId());
+		clientConnections.remove(clientConnection);
 	}
 
 	public void connect(ClientConnection clientConnection) {
@@ -109,4 +120,5 @@ public class BoulderMapServer {
 	public boolean isRunning() {
 		return running;
 	}
+	
 }

@@ -76,6 +76,28 @@ public class GameTest {
 	}
 	
 	@Test
+	public void testRemovePlayer() {
+		BoulderCellEnum[][] grille = 
+		{{V, V, V},
+		{V, V, V},
+		{V, V, V}};
+		
+		BoulderMap boulderMap = new BoulderMap(grille);
+		int playerId = boulderMap.addPlayer(new BoulderCell(1, 1));
+		
+		BoulderCellEnum[][] newGrille = 
+		{{V, V, V},
+		{V, P, V},
+		{V, V, V}};
+		
+		testMap(newGrille, boulderMap.getMap());
+		
+		boulderMap.removePlayer(playerId);
+		
+		testMap(grille, boulderMap.getMap());
+	}
+	
+	@Test
 	public void testMoveUpAllowedAndEatTheGoodEarth() {
 		BoulderCellEnum[][] grille = 
 		{{V, T, V},
@@ -224,7 +246,7 @@ public class GameTest {
 		{V, V, R, V, V}};
 		testMap(movedGrille, boulderMap.getMap());
 		
-		// XXX Ici le personnage se prend le caillou sur la tête et meurt dans d'atroces souffrances
+		// XXX Ici le personnage se prend le caillou sur la tï¿½te et meurt dans d'atroces souffrances
 	}
 	
 	@Test
@@ -265,7 +287,7 @@ public class GameTest {
 		BoulderCellEnum[][] movedGrille = 
 		{{V, V, V, V, V},
 		{V, V, R, V, V},
-		{V, R, V, P, R},
+		{V, R, V, Q, R},
 		{V, V, R, V, V},
 		{V, V, V, V, V}};
 		testMap(movedGrille, boulderMap.getMap());
@@ -285,7 +307,7 @@ public class GameTest {
 		Assert.assertEquals(1, boulderMap.getNbDiamond(player));
 		BoulderCellEnum[][] movedGrille = 
 		{{V, V, V},
-		{V, V, P},
+		{V, V, Q},
 		{V, V, V}};
 		testMap(movedGrille, boulderMap.getMap());
 	}

@@ -7,19 +7,25 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.Rectangle;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
-import java.awt.image.BufferedImage;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.FilteredImageSource;
 import java.awt.image.ImageFilter;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
-import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 
 import com.open.dojo.bouldernet.BoulderCell;
 import com.open.dojo.bouldernet.BoulderCellEnum;
 import com.open.dojo.bouldernet.DirectionEnum;
+import com.open.dojo.bouldernet.gui.themes.ThemeManager;
 
 public class GrillePanel extends JPanel implements MapListener {
 
@@ -33,21 +39,21 @@ public class GrillePanel extends JPanel implements MapListener {
 	
 	private ClientMapModel map = null;
 	
-	private final BufferedImage icons;
-
-	private BoulderGUI gui;
-	
 	private int diamondCounter = 0;
 	
 	private int lifeCounter = 0;
+
+	private ThemeManager themeManager;
 	
-	public GrillePanel(BoulderGUI gui, BoulderMapProxy grille) throws IOException {
-		this.gui = gui;
+	private Map<Integer, Image[]> playerImageCache = new HashMap<Integer, Image[]>();
+	
+	public GrillePanel(BoulderMapProxy grille, ThemeManager themeManager) throws IOException {
+		this.themeManager = themeManager;
 		this.grille = grille;
 		this.grille.addMapListener(this);
 		setOpaque(true);
 		setBackground(Color.BLACK);
-		icons = ImageIO.read(getClass().getResourceAsStream("/images/sprites.png"));
+		
 		addKeyListener(new KeyAdapter() {
 			
 			@Override
@@ -74,6 +80,19 @@ public class GrillePanel extends JPanel implements MapListener {
 				}
 				GrillePanel.this.grille.move(direction);
 				GrillePanel.this.repaint();
+			}
+		});
+		addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseClicked(MouseEvent e) {
+				Rectangle rect = new Rectangle(getWidth() - 50-4, 16-4, 32+4*2, 32+4*2);
+				if (rect.contains(e.getX(), e.getY())) {
+					JFrame frame = (JFrame) SwingUtilities.getRoot(GrillePanel.this);
+					OptionDialog dialog = new OptionDialog(frame, GrillePanel.this.themeManager);
+					dialog.setLocationRelativeTo(frame);
+					dialog.setVisible(true);
+					playerImageCache.clear();
+				}
 			}
 		});
 		setFocusable(true);
@@ -103,21 +122,33 @@ public class GrillePanel extends JPanel implements MapListener {
 		for (int y = 0; y < map.getHeight(); ++y) {
 			for (int x = 0; x < map.getWidth(); ++x) {
 				BoulderCellEnum cell = map.getCell(x, y);
-				int offset = cell.ordinal() * CELL_WIDTH;
 				
 				if (cell.isPerson()) {
-					BufferedImage playerImage = icons.getSubimage(offset, 0, CELL_WIDTH, CELL_HEIGHT);
+					
 					int playerId = map.getPlayerId(new BoulderCell(x, y));
-					ImageFilter colorfilter = new HueImageFilter(playerId);
-				    Image coloredImage = createImage(new FilteredImageSource(playerImage.getSource(),colorfilter));
-					g.drawImage(coloredImage, x*CELL_WIDTH, HEADER_HEIGHT + y*CELL_HEIGHT, this);
+					Image coloredImage = getCachedPlayerImage(playerId, cell);
+				    g.drawImage(coloredImage, x*CELL_WIDTH, HEADER_HEIGHT + y*CELL_HEIGHT, this);
 				} else {
-					g.drawImage(icons, x*CELL_WIDTH, HEADER_HEIGHT + y*CELL_HEIGHT,
-							(x+1)*CELL_WIDTH, HEADER_HEIGHT + (y+1)*CELL_HEIGHT,
-							offset, 0, offset + CELL_WIDTH, CELL_HEIGHT, this);
+					g.drawImage(themeManager.getIcon(cell), x*CELL_WIDTH, HEADER_HEIGHT + y*CELL_HEIGHT, this);
 				}
 			}
 		}
+	}
+
+	private Image getCachedPlayerImage(int playerId, BoulderCellEnum cell) {
+		Image[] cachedImages = playerImageCache.get(playerId);
+		if (cachedImages == null) {
+			cachedImages = new Image[2];
+		    cachedImages[0] = createImage(BoulderCellEnum.P, playerId);
+		    cachedImages[1] = createImage(BoulderCellEnum.Q, playerId);
+		}
+		return cachedImages[cell.ordinal() - BoulderCellEnum.P.ordinal()];
+	}
+
+	private Image createImage(BoulderCellEnum cell, int playerId) {
+		Image playerImage = themeManager.getIcon(cell);
+		ImageFilter colorfilter = new HueImageFilter(playerId);
+		return createImage(new FilteredImageSource(playerImage.getSource(),colorfilter));
 	}
 
 	private void drawHeader(Graphics g) {
@@ -127,18 +158,18 @@ public class GrillePanel extends JPanel implements MapListener {
 		g2d.setFont(new Font("Arial", Font.BOLD, 25));
 		
 		int x = 16;
-		int offset = BoulderCellEnum.D.ordinal() * CELL_WIDTH;
 		g2d.drawRoundRect(x-4, 16-4, 32+4*2, 32+4*2, 8, 8);
-		g2d.drawImage(icons, x, 16, x + CELL_WIDTH, 16 + CELL_HEIGHT,
-				offset, 0, offset + CELL_WIDTH, CELL_HEIGHT, this);
+		g2d.drawImage(themeManager.getIcon(BoulderCellEnum.D), x, 16, this);
 		g2d.drawString(String.valueOf(diamondCounter), 16 + CELL_WIDTH + 20, 16 + CELL_HEIGHT - 6);
 		
 		x = 300;
-		offset = BoulderCellEnum.C.ordinal() * CELL_WIDTH;
 		g2d.drawRoundRect(x-4, 16-4, 32+4*2, 32+4*2, 8, 8);
-		g2d.drawImage(icons, x, 16, x + CELL_WIDTH, 16 + CELL_HEIGHT,
-				offset, 0, offset + CELL_WIDTH, CELL_HEIGHT, this);
+		g2d.drawImage(themeManager.getIcon(BoulderCellEnum.C), x, 16, this);
 		g2d.drawString(String.valueOf(lifeCounter), x + CELL_WIDTH + 20, 16 + CELL_HEIGHT - 6);
+		
+		x = getWidth() - 50;
+		g2d.drawRoundRect(x-4, 16-4, 32+4*2, 32+4*2, 8, 8);
+		g2d.fillPolygon(new int[] {x+8, x+32-8, x+16}, new int[] {16+8, 16+8, 48-8}, 3);
 		
 	}
 
@@ -147,8 +178,8 @@ public class GrillePanel extends JPanel implements MapListener {
 		this.diamondCounter = diamonds;
 		this.lifeCounter = lifes;
 		this.map = map;
+		invalidate();
 		repaint();
-		gui.pack();
 	}
 
 }

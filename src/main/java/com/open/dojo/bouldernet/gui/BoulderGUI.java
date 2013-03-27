@@ -1,24 +1,27 @@
 package com.open.dojo.bouldernet.gui;
 
 import java.awt.BorderLayout;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.io.IOException;
 
 import javax.swing.JFrame;
 
 import com.open.dojo.bouldernet.BoulderCellEnum;
 import com.open.dojo.bouldernet.BoulderMap;
+import com.open.dojo.bouldernet.gui.themes.ThemeManagerImpl;
 import com.open.dojo.bouldernet.server.BoulderMapServer;
 /*
  * TODO:
  * - Affichage des scores (J1 XX - J2 XX - ...) avec couleur du joueur
  * - Affichage disctinction joueurs (1 couleur par joueur)
- * - Gestion des pertes de vie par �crasement par rocher
+ * - Gestion des pertes de vie par écrasement par rocher
  * - Gestion fin de map avec lancement nouvelle map
- * - Gestion g�n�ration al�atoire de pi�ges
- * - Gestion �ventuelle porte de sortie
- * - Gestion cr�ation d'un diamant par r�alisation d'un pattern avec rochers
- * - Am�lioration des graphismes
- * - Am�lioration fluidit�
+ * - Gestion génération aléatoire de pièges
+ * - Gestion éventuelle porte de sortie
+ * - Gestion création d'un diamant par réalisation d'un pattern avec rochers
+ * - Amélioration des graphismes
+ * - Amélioration fluidité
  * - Gestion touche de respawn en cas de blocage avec perte de 1 vie
  * - Ajout sons
  * 
@@ -28,13 +31,19 @@ public class BoulderGUI extends JFrame {
 	private static final long serialVersionUID = 1L;
 	
 	public BoulderGUI(BoulderMapProxy proxy) throws IOException {
-		//setSize(1300, 845);
 		setTitle("MMO BoulderNet");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		getContentPane().add(new GrillePanel(this, proxy), BorderLayout.CENTER);
+		GrillePanel panel = new GrillePanel(proxy, new ThemeManagerImpl());
+		panel.addComponentListener(new ComponentAdapter() {
+			@Override
+			public void componentResized(ComponentEvent e) {
+				pack();
+			}
+		});
 		
-		pack();
+		getContentPane().add(panel, BorderLayout.CENTER);
+		
 	}
 	
 	public static void main(String[] args) throws IOException {
@@ -43,7 +52,7 @@ public class BoulderGUI extends JFrame {
 		if ((args == null) || (args.length == 0)) {
 			parameterError = true;
 		} else if ("serveur".equals(args[0])){
-				// Si param�tre = serveur alors on est serveur ET client
+				// Si paramètre = serveur alors on est serveur ET client
 	
 				// <---- Code server
 				BoulderCellEnum [][] grilleDeDepart = getRandomMap(40, 25, 25, 75);
@@ -58,7 +67,7 @@ public class BoulderGUI extends JFrame {
 				gui.setVisible(true);
 				// -->
 			} else if (("client".equals(args[0])) && (args[1].matches("[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}.[0-9]{1,3}"))){
-				// Si param�tre = adresse IP, on est client
+				// Si paramètre = adresse IP, on est client
 				
 				// Bridge
 				BoulderMapProxy proxy = new NetworkBoulderMapProxyImpl(args[1]);
@@ -72,8 +81,8 @@ public class BoulderGUI extends JFrame {
 			}
 		
 		if (parameterError) {
-			// Erreur de param�tre
-			System.out.println("Erreur de param�tres !");
+			// Erreur de paramètre
+			System.out.println("Erreur de paramètres !");
 			System.exit(1);
 		}
 	}

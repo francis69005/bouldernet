@@ -1,6 +1,7 @@
 package com.open.dojo.bouldernet;
 
 import static com.open.dojo.bouldernet.BoulderCellEnum.P;
+import static com.open.dojo.bouldernet.BoulderCellEnum.Q;
 import static com.open.dojo.bouldernet.BoulderCellEnum.T;
 import static com.open.dojo.bouldernet.BoulderCellEnum.V;
 
@@ -58,7 +59,7 @@ public class MultiPlayerGameTest {
 		boulderMap.move(player1, DirectionEnum.RIGHT);
 		
 		BoulderCellEnum[][] expected2players = 
-		{{V, P, T},
+		{{V, Q, T},
 		{T, T, T},
 		{T, T, P}};
 		testMap(expected2players, boulderMap.getMap());
@@ -79,7 +80,7 @@ public class MultiPlayerGameTest {
 		boulderMap.move(player2, DirectionEnum.LEFT);
 		
 		BoulderCellEnum[][] expected2players = 
-		{{V, P, T},
+		{{V, Q, T},
 		{T, T, T},
 		{T, P, V}};
 		testMap(expected2players, boulderMap.getMap());
@@ -88,7 +89,7 @@ public class MultiPlayerGameTest {
 		boulderMap.move(player2, DirectionEnum.LEFT);
 		
 		BoulderCellEnum[][] expected2players2 = 
-		{{V, V, P},
+		{{V, V, Q},
 		{T, T, T},
 		{P, V, V}};
 		testMap(expected2players2, boulderMap.getMap());

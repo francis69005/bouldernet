@@ -48,7 +48,7 @@ public class NetworkTest {
 		{T, R, R, T, T, T, T, T , T, T},
 		{T, T, T, T, T, T, T, T , T, T}};
 		
-		server = new BoulderMapServer(new BoulderMap(grilleDeDepart));
+		server = new BoulderMapServer(new BoulderMap(grilleDeDepart), false);
 	}
 
 	@After
@@ -95,9 +95,16 @@ public class NetworkTest {
 		try{
 			String serverResponse = bufferedReader.readLine();
 			Assert.assertEquals("Hello 0", serverResponse);
+			
 			serverResponse = bufferedReader.readLine();
 			Assert.assertNotNull(serverResponse);
-			Assert.assertEquals(  "P,T,R,T,T,T,T,T,T,T&"
+			String[] infos = serverResponse.split("&");
+			Assert.assertEquals(0, Integer.parseInt(infos[0]));
+			Assert.assertEquals(0, Integer.parseInt(infos[1]));
+			
+			serverResponse = bufferedReader.readLine();
+			Assert.assertNotNull(serverResponse);
+			Assert.assertEquals(  "P0,T,R,T,T,T,T,T,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,R,T,T,T,T,R,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
@@ -126,9 +133,16 @@ public class NetworkTest {
 		try{
 			String serverResponse = bufferedReader.readLine();
 			Assert.assertEquals("Hello 0", serverResponse);
+			
 			serverResponse = bufferedReader.readLine();
 			Assert.assertNotNull(serverResponse);
-			Assert.assertEquals(  "P,T,R,T,T,T,T,T,T,T&"
+			String[] infos = serverResponse.split("&");
+			Assert.assertEquals(0, Integer.parseInt(infos[0]));
+			Assert.assertEquals(0, Integer.parseInt(infos[1]));
+			
+			serverResponse = bufferedReader.readLine();
+			Assert.assertNotNull(serverResponse);
+			Assert.assertEquals(  "P0,T,R,T,T,T,T,T,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,R,T,T,T,T,R,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
@@ -141,10 +155,18 @@ public class NetworkTest {
 			
 			printStream.println(DirectionEnum.DOWN.name() + " 0");
 			
+			sync();
+			
+			serverResponse = bufferedReader.readLine();
+			Assert.assertNotNull(serverResponse);
+			infos = serverResponse.split("&");
+			Assert.assertEquals(0, Integer.parseInt(infos[0]));
+			Assert.assertEquals(0, Integer.parseInt(infos[1]));
+			
 			serverResponse = bufferedReader.readLine();
 			Assert.assertNotNull(serverResponse);
 			Assert.assertEquals(  "V,T,R,T,T,T,T,T,T,T&"
-								+ "P,T,T,T,T,T,T,T,T,T&"
+								+ "P0,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,R,T,T,T,T,R,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,T,R,T,T,T,R,T,T&"
@@ -172,9 +194,16 @@ public class NetworkTest {
 		try{
 			String serverResponse1 = bufferedReader1.readLine();
 			Assert.assertEquals("Hello 0", serverResponse1);
+			
 			serverResponse1 = bufferedReader1.readLine();
 			Assert.assertNotNull(serverResponse1);
-			Assert.assertEquals(  "P,T,R,T,T,T,T,T,T,T&"
+			String[] infos = serverResponse1.split("&");
+			Assert.assertEquals(0, Integer.parseInt(infos[0]));
+			Assert.assertEquals(0, Integer.parseInt(infos[1]));
+			
+			serverResponse1 = bufferedReader1.readLine();
+			Assert.assertNotNull(serverResponse1);
+			Assert.assertEquals(  "P0,T,R,T,T,T,T,T,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,R,T,T,T,T,R,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
@@ -187,10 +216,18 @@ public class NetworkTest {
 			
 			printStream1.println(DirectionEnum.DOWN.name() + " 0");
 			
+			sync();
+			
+			serverResponse1 = bufferedReader1.readLine();
+			Assert.assertNotNull(serverResponse1);
+			infos = serverResponse1.split("&");
+			Assert.assertEquals(0, Integer.parseInt(infos[0]));
+			Assert.assertEquals(0, Integer.parseInt(infos[1]));
+			
 			serverResponse1 = bufferedReader1.readLine();
 			Assert.assertNotNull(serverResponse1);
 			Assert.assertEquals(  "V,T,R,T,T,T,T,T,T,T&"
-								+ "P,T,T,T,T,T,T,T,T,T&"
+								+ "P0,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,R,T,T,T,T,R,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,T,R,T,T,T,R,T,T&"
@@ -209,10 +246,17 @@ public class NetworkTest {
 			
 			String serverResponse2 = bufferedReader2.readLine();
 			Assert.assertEquals("Hello 1", serverResponse2);
+			
 			serverResponse2 = bufferedReader2.readLine();
 			Assert.assertNotNull(serverResponse2);
-			Assert.assertEquals(  "P,T,R,T,T,T,T,T,T,T&"
-								+ "P,T,T,T,T,T,T,T,T,T&"
+			infos = serverResponse2.split("&");
+			Assert.assertEquals(0, Integer.parseInt(infos[0]));
+			Assert.assertEquals(0, Integer.parseInt(infos[1]));
+			
+			serverResponse2 = bufferedReader2.readLine();
+			Assert.assertNotNull(serverResponse2);
+			Assert.assertEquals(  "P1,T,R,T,T,T,T,T,T,T&"
+								+ "P0,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,R,T,T,T,T,R,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,T,R,T,T,T,R,T,T&"
@@ -224,10 +268,18 @@ public class NetworkTest {
 
 			printStream2.println(DirectionEnum.RIGHT.name() + " 1");
 			
+			sync();
+			
 			serverResponse2 = bufferedReader2.readLine();
 			Assert.assertNotNull(serverResponse2);
-			Assert.assertEquals(  "V,P,R,T,T,T,T,T,T,T&"
-								+ "P,T,T,T,T,T,T,T,T,T&"
+			infos = serverResponse2.split("&");
+			Assert.assertEquals(0, Integer.parseInt(infos[0]));
+			Assert.assertEquals(0, Integer.parseInt(infos[1]));
+			
+			serverResponse2 = bufferedReader2.readLine();
+			Assert.assertNotNull(serverResponse2);
+			Assert.assertEquals(  "V,Q1,R,T,T,T,T,T,T,T&"
+								+ "P0,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,R,T,T,T,T,R,T,T&"
 								+ "T,T,T,T,T,T,T,T,T,T&"
 								+ "T,T,T,R,T,T,T,R,T,T&"
@@ -245,6 +297,15 @@ public class NetworkTest {
 			if (socket2 != null) {
 				socket2.close();
 			}
+		}
+	}
+
+	private void sync() {
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}
 	}
 	

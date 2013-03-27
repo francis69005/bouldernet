@@ -131,6 +131,14 @@ public class BoulderMap {
 		return newId;
 	}
 	
+	public void removePlayer(int playerId) {
+		Player player = playerById.remove(playerId);
+		if (player != null) {
+			BoulderCell boulderCell = player.getBoulderCell();
+			map[boulderCell.getY()][boulderCell.getX()] = BoulderCellEnum.V;
+		}
+	}
+	
 	public BoulderCell getPersonneCell(int playerId) {
 		return playerById.get(playerId).getBoulderCell();
 	}
@@ -166,5 +174,7 @@ public class BoulderMap {
 		}
 		return null;
 	}
+
+	
 	
 }
