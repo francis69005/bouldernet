@@ -81,7 +81,7 @@ public class ClientConnection implements Runnable{
 	public void sendChange() {
 		printStream.print(boulderMapServer.getBoulderMap().getNbDiamond(playerId));
 		printStream.print("&");
-		printStream.println(boulderMapServer.getBoulderMap().getNbLifes(playerId));
+		printStream.println(boulderMapServer.getBoulderMap().getNbDeaths(playerId));
 		printStream.println(serializeMap());
 	}
 

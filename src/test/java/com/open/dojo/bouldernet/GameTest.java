@@ -37,12 +37,6 @@ public class GameTest {
 		BoulderMap boulderMap = new BoulderMap(grille);
 		Assert.assertEquals(grille[0].length, boulderMap.getHorizontalSize());
 		Assert.assertEquals(grille.length, boulderMap.getVerticalSize());
-		Assert.assertEquals(0, boulderMap.getPersonneCount());
-		Assert.assertEquals(0, boulderMap.getPersonneCount());
-		Assert.assertEquals(9, boulderMap.getTerreCount());
-		Assert.assertEquals(0, boulderMap.getDiamantCount());
-		Assert.assertEquals(0, boulderMap.getVideCount());
-		Assert.assertEquals(0, boulderMap.getSortieCount());
 	}
 	
 	private void testMap(BoulderCellEnum[][] expected, BoulderCellEnum[][] actual) {
@@ -291,6 +285,36 @@ public class GameTest {
 		{V, V, R, V, V},
 		{V, V, V, V, V}};
 		testMap(movedGrille, boulderMap.getMap());
+	}
+	
+	@Test
+	public void testPlayerGetKilledByARockFallingOnHisHead() {
+		BoulderCellEnum[][] grille = 
+		{{V, R, V},
+		{V, V, V},
+		{V, V, V}};
+		
+		BoulderMap boulderMap = new BoulderMap(grille);
+		int playerId = boulderMap.addPlayer(new BoulderCell(1, 1));
+		boulderMap.move(playerId, DirectionEnum.DOWN);
+		
+		BoulderCellEnum[][] movedGrille = 
+		{{V, R, V},
+		{V, V, V},
+		{V, P, V}};
+		testMap(movedGrille, boulderMap.getMap());
+		
+		boulderMap.moveObjects();
+		
+		BoulderCellEnum[][] movedRockGrille = 
+		{{V, V, V},
+		{V, R, V},
+		{V, P, V}};
+		testMap(movedRockGrille, boulderMap.getMap());
+		
+		boulderMap.moveObjects();
+		
+		Assert.assertEquals(1, boulderMap.getNbDeaths(playerId));
 	}
 	
 	@Test

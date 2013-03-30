@@ -2,8 +2,10 @@ package com.open.dojo.bouldernet.gui.themes;
 
 import java.awt.Image;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 
 import com.open.dojo.bouldernet.BoulderCellEnum;
@@ -13,6 +15,7 @@ public class ThemeManagerImpl implements ThemeManager {
 
 	private List<Theme> themes = new ArrayList<Theme>();
 	private Theme currentTheme = new ClassicTheme();
+	private Map<BoulderCellEnum, Image> imageCache = new HashMap<BoulderCellEnum, Image>();
 
 	public ThemeManagerImpl() {
 		Iterator<Theme> serviceIterator = ServiceLoader.load(Theme.class).iterator();
@@ -27,7 +30,11 @@ public class ThemeManagerImpl implements ThemeManager {
 
 	@Override
 	public Image getIcon(BoulderCellEnum cell) {
-		return currentTheme.getIcon(cell);
+		Image image = imageCache.get(cell);
+		if (image == null) {
+			imageCache.put(cell, image = currentTheme.getIcon(cell));
+		}
+		return image;
 	}
 
 	@Override
@@ -43,5 +50,6 @@ public class ThemeManagerImpl implements ThemeManager {
 	@Override
 	public void setTheme(Theme theme) {
 		this.currentTheme = theme;
+		imageCache.clear();
 	}
 }

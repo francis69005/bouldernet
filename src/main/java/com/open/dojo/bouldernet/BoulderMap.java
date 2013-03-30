@@ -1,15 +1,16 @@
 package com.open.dojo.bouldernet;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 
 public class BoulderMap {
 
 	private BoulderCellEnum[][] map;
 	private Map<Integer, Player> playerById = new HashMap<Integer, Player>();
-	public BoulderMap() {
-	}
+	private Set<BoulderCell> movingRocks = new HashSet<BoulderCell>();
 	
 	public BoulderMap(BoulderCellEnum[][] grille) {
 		map = new BoulderCellEnum[grille.length][grille[0].length];
@@ -26,31 +27,6 @@ public class BoulderMap {
 
 	public int getVerticalSize() {
 		return map.length;
-	}
-
-	public int getPersonneCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int getTerreCount() {
-		// TODO Auto-generated method stub
-		return 9;
-	}
-
-	public int getDiamantCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int getVideCount() {
-		// TODO Auto-generated method stub
-		return 0;
-	}
-
-	public int getSortieCount() {
-		// TODO Auto-generated method stub
-		return 0;
 	}
 
 	public void move(int playerId, DirectionEnum direction) {
@@ -76,14 +52,47 @@ public class BoulderMap {
 	public void moveObjects(){
 		for (int y = map.length - 2; y >= 0; y--) {
 			for (int x = 0; x < map[0].length; x++) {
+				BoulderCell cell = new BoulderCell(x, y);
 				if (map[y][x] == BoulderCellEnum.R) {
-					if (map[y+1][x] == BoulderCellEnum.V) {
-						map[y+1][x] = BoulderCellEnum.R;
-						map[y][x] = BoulderCellEnum.V;
-					}		
+					tryMoveRock(cell);
 				}
 			}
 		}
+		// rocks at the bottom can't move anymore
+		for (int x = 0; x < map[0].length; x++) {
+			BoulderCell cell = new BoulderCell(x, map.length-1);
+			movingRocks.remove(cell);
+		}
+	}
+	
+	private void tryMoveRock(BoulderCell cell) {
+		BoulderCell underCell = cell.getNextCell(DirectionEnum.DOWN);
+		BoulderCellEnum underCellType = getCell(underCell);
+		if (movingRocks.contains(cell) && underCellType.isPerson()) {
+			moveRock(cell, underCell);
+			Player player = getPlayer(underCell);
+			player.addDeath();
+			player.setBoulderCell(getRandomPlayerSpawn());
+		} else if (underCellType == BoulderCellEnum.V) {
+			moveRock(cell, underCell);
+		} else {
+			movingRocks.remove(cell);
+		}
+	}
+
+	private void moveRock(BoulderCell from, BoulderCell to) {
+		setCell(to, BoulderCellEnum.R);
+		setCell(from, BoulderCellEnum.V);
+		movingRocks.remove(from);
+		movingRocks.add(to);
+	}
+	
+	private BoulderCellEnum getCell(BoulderCell cell) {
+		return map[cell.getY()][cell.getX()];
+	}
+	
+	private void setCell(BoulderCell cell, BoulderCellEnum value) {
+		map[cell.getY()][cell.getX()] = value;
 	}
 
 	private boolean isMoveAllowed(BoulderCell wantedPersoCell, DirectionEnum direction) {
@@ -151,7 +160,7 @@ public class BoulderMap {
 		return playerById.get(player).getNbDiamond();
 	}
 	
-	public int getNbLifes(int playerId) {
+	public int getNbDeaths(int playerId) {
 		return playerById.get(playerId).getNbDeath();
 	}
 	
@@ -159,7 +168,7 @@ public class BoulderMap {
 		while (true) {
 			int y = (int)(Math.random()*map.length);
 			int x = (int)(Math.random()*map[0].length);
-			if (map[y][x] == BoulderCellEnum.T) {
+			if (map[y][x] == BoulderCellEnum.T || map[y][x] == BoulderCellEnum.V) {
 				map[y][x] = BoulderCellEnum.P;
 				return new BoulderCell(x, y);
 			}
@@ -174,7 +183,5 @@ public class BoulderMap {
 		}
 		return null;
 	}
-
-	
 	
 }

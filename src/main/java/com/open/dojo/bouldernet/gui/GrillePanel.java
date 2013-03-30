@@ -41,7 +41,7 @@ public class GrillePanel extends JPanel implements MapListener {
 	
 	private int diamondCounter = 0;
 	
-	private int lifeCounter = 0;
+	private int deathCounter = 0;
 
 	private ThemeManager themeManager;
 	
@@ -141,13 +141,14 @@ public class GrillePanel extends JPanel implements MapListener {
 			cachedImages = new Image[2];
 		    cachedImages[0] = createImage(BoulderCellEnum.P, playerId);
 		    cachedImages[1] = createImage(BoulderCellEnum.Q, playerId);
+		    playerImageCache.put(playerId, cachedImages);
 		}
 		return cachedImages[cell.ordinal() - BoulderCellEnum.P.ordinal()];
 	}
 
 	private Image createImage(BoulderCellEnum cell, int playerId) {
 		Image playerImage = themeManager.getIcon(cell);
-		ImageFilter colorfilter = new HueImageFilter(playerId);
+		ImageFilter colorfilter = new PlayerColorFilter(playerId);
 		return createImage(new FilteredImageSource(playerImage.getSource(),colorfilter));
 	}
 
@@ -165,7 +166,7 @@ public class GrillePanel extends JPanel implements MapListener {
 		x = 300;
 		g2d.drawRoundRect(x-4, 16-4, 32+4*2, 32+4*2, 8, 8);
 		g2d.drawImage(themeManager.getIcon(BoulderCellEnum.C), x, 16, this);
-		g2d.drawString(String.valueOf(lifeCounter), x + CELL_WIDTH + 20, 16 + CELL_HEIGHT - 6);
+		g2d.drawString(String.valueOf(deathCounter), x + CELL_WIDTH + 20, 16 + CELL_HEIGHT - 6);
 		
 		x = getWidth() - 50;
 		g2d.drawRoundRect(x-4, 16-4, 32+4*2, 32+4*2, 8, 8);
@@ -174,9 +175,9 @@ public class GrillePanel extends JPanel implements MapListener {
 	}
 
 	@Override
-	public void sendChange(int diamonds, int lifes, ClientMapModel map) {
+	public void sendChange(int diamonds, int deaths, ClientMapModel map) {
 		this.diamondCounter = diamonds;
-		this.lifeCounter = lifes;
+		this.deathCounter = deaths;
 		this.map = map;
 		invalidate();
 		repaint();

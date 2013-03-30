@@ -68,6 +68,8 @@ public class NetworkBoulderMapProxyImpl implements BoulderMapProxy, Runnable {
 					if (serializedMap != null && listener != null) {
 						listener.sendChange(diamonds, lifes, deSerializeMap(serializedMap));
 					}
+				} else {
+					break; // lost connection
 				}
 			}
 		} catch (IOException e) {
