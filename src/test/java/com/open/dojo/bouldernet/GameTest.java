@@ -399,4 +399,15 @@ public class GameTest {
 		testMap(expectedGrille, boulderMap.getMap());
 	}
 
+	@Test
+	public void testRemainingDiamonds() {
+		BoulderCellEnum[][] grille = 
+		{{D, R, V},
+		{V, V, V},
+		{V, V, D}};
+		
+		BoulderMap boulderMap = new BoulderMap(grille);
+		boulderMap.moveObjects();
+		Assert.assertEquals(2, boulderMap.getRemainingDiamonds());
+	}
 }

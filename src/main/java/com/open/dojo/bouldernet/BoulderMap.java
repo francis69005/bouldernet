@@ -140,6 +140,11 @@ public class BoulderMap {
 		return newId;
 	}
 	
+	public void addPlayer(Player player) {
+		player.setBoulderCell(getRandomPlayerSpawn());
+		playerById.put(player.getId(), player);
+	}
+	
 	public void removePlayer(int playerId) {
 		Player player = playerById.remove(playerId);
 		if (player != null) {
@@ -164,6 +169,19 @@ public class BoulderMap {
 		return playerById.get(playerId).getNbDeath();
 	}
 	
+	public int getRemainingDiamonds() {
+		int diamondsCount = 0;
+		for (int y = 0; y < map.length; y++) {
+			for (int x = 0; x < map[0].length; x++) {
+				if (map[y][x] == BoulderCellEnum.D) {
+					diamondsCount++;
+				}
+			}
+		}
+		
+		return diamondsCount;
+	}
+	
 	private BoulderCell getRandomPlayerSpawn() {
 		while (true) {
 			int y = (int)(Math.random()*map.length);
@@ -184,4 +202,7 @@ public class BoulderMap {
 		return null;
 	}
 	
+	public Map<Integer, Player> getPlayers() {
+		return playerById;
+	}
 }

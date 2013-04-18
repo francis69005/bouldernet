@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import com.open.dojo.bouldernet.BoulderCell;
+import com.open.dojo.bouldernet.BoulderCellEnum;
 import com.open.dojo.bouldernet.BoulderMap;
 import com.open.dojo.bouldernet.DirectionEnum;
+import com.open.dojo.bouldernet.Player;
 
 public class BoulderMapServer {
 
@@ -24,12 +26,20 @@ public class BoulderMapServer {
 	private boolean autoSpawn;
 
 	public BoulderMapServer(BoulderMap boulderMap) throws IOException {
-		this(boulderMap, true);
+		this(boulderMap, false);
+	}
+	
+	public BoulderMapServer() throws IOException {
+		this(null, true);
 	}
 	
 	public BoulderMapServer(BoulderMap boulderMap, boolean autoSpawn) throws IOException {
 		this.autoSpawn = autoSpawn;
-		this.boulderMap = boulderMap;
+		if (boulderMap == null) {
+			this.boulderMap = new BoulderMap(getRandomMap(40, 25, 25, 75));
+		} else {
+			this.boulderMap = boulderMap;
+		}
 		
 		// ouverture du socket de rendez-vous
 		serverSocket = new ServerSocket(9292);
@@ -52,6 +62,18 @@ public class BoulderMapServer {
 						for (ClientConnection clientConnection : clientConnections) {
 							clientConnection.sendChange();
 						}
+						
+						// Détection de la fin de partie et génération nouvelle map
+						int remainingDiamonds = BoulderMapServer.this.boulderMap.getRemainingDiamonds();
+						if (remainingDiamonds == 0) {
+							// Sauvegarde des infos des joueurs
+							Map<Integer, Player> playerById = BoulderMapServer.this.boulderMap.getPlayers();
+							BoulderMapServer.this.boulderMap = new BoulderMap(getRandomMap(40, 25, 25, 75));
+							for (Player player : playerById.values()) {
+								BoulderMapServer.this.boulderMap.addPlayer(player);
+							}
+						}
+						
 						Thread.sleep(200);
 					} catch (InterruptedException e) {
 						e.printStackTrace();
@@ -121,4 +143,36 @@ public class BoulderMapServer {
 		return running;
 	}
 	
+	private static BoulderCellEnum [][] getRandomMap(int horizontalSize, int verticalSize, int diamondNb, int rockNb) {
+		BoulderCellEnum [][] grille = new BoulderCellEnum[verticalSize][horizontalSize];
+		// Remplissage Terre
+		for (int y = 0; y < verticalSize; y++) {
+			for (int x = 0; x < horizontalSize; x++) {
+				grille[y][x] = BoulderCellEnum.T;
+			}
+		}
+
+		// Remplissage Diamants
+		for (int count = 0; count < diamondNb; count++) {
+			setRandomMapCell(grille, BoulderCellEnum.D);
+		}
+		
+		// Remplissage Rochers
+		for (int count = 0; count < rockNb; count++) {
+			setRandomMapCell(grille, BoulderCellEnum.R);
+		}
+		
+		return grille;
+	}
+	
+	private static void setRandomMapCell(BoulderCellEnum [][] grille, BoulderCellEnum cellType) {
+		while (true) {
+			int y = (int)(Math.random()*grille.length);
+			int x = (int)(Math.random()*grille[0].length);
+			if (grille[y][x] == BoulderCellEnum.T) {
+				grille[y][x] = cellType;
+				break;
+			}
+		}
+	}
 }

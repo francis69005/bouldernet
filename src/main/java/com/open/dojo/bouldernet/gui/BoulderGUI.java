@@ -9,6 +9,9 @@ import javax.swing.JFrame;
 
 import com.open.dojo.bouldernet.BoulderCellEnum;
 import com.open.dojo.bouldernet.BoulderMap;
+import com.open.dojo.bouldernet.gui.BoulderMapProxy;
+import com.open.dojo.bouldernet.gui.GrillePanel;
+import com.open.dojo.bouldernet.gui.NetworkBoulderMapProxyImpl;
 import com.open.dojo.bouldernet.gui.themes.ThemeManagerImpl;
 import com.open.dojo.bouldernet.server.BoulderMapServer;
 /*
@@ -55,8 +58,7 @@ public class BoulderGUI extends JFrame {
 				// Si paramètre = serveur alors on est serveur ET client
 	
 				// <---- Code server
-				BoulderCellEnum [][] grilleDeDepart = getRandomMap(40, 25, 25, 75);
-				BoulderMapServer server = new BoulderMapServer(new BoulderMap(grilleDeDepart));
+				BoulderMapServer server = new BoulderMapServer();
 				// ---->
 				
 				// Bridge
@@ -84,39 +86,6 @@ public class BoulderGUI extends JFrame {
 			// Erreur de paramètre
 			System.out.println("Erreur de paramètres !");
 			System.exit(1);
-		}
-	}
-	
-	private static BoulderCellEnum [][] getRandomMap(int horizontalSize, int verticalSize, int diamondNb, int rockNb) {
-		BoulderCellEnum [][] grille = new BoulderCellEnum[verticalSize][horizontalSize];
-		// Remplissage Terre
-		for (int y = 0; y < verticalSize; y++) {
-			for (int x = 0; x < horizontalSize; x++) {
-				grille[y][x] = BoulderCellEnum.T;
-			}
-		}
-
-		// Remplissage Diamants
-		for (int count = 0; count < diamondNb; count++) {
-			setRandomMapCell(grille, BoulderCellEnum.D);
-		}
-		
-		// Remplissage Rochers
-		for (int count = 0; count < rockNb; count++) {
-			setRandomMapCell(grille, BoulderCellEnum.R);
-		}
-		
-		return grille;
-	}
-	
-	private static void setRandomMapCell(BoulderCellEnum [][] grille, BoulderCellEnum cellType) {
-		while (true) {
-			int y = (int)(Math.random()*grille.length);
-			int x = (int)(Math.random()*grille[0].length);
-			if (grille[y][x] == BoulderCellEnum.T) {
-				grille[y][x] = cellType;
-				break;
-			}
 		}
 	}
 }
